@@ -5,6 +5,7 @@
 import requests
 import time
 
+
 API_URL: str = 'https://api.telegram.org/bot'
 API_CATS_URL: str = 'https://aws.random.cat/meow'
 BOT_TOKEN: str = ''
@@ -22,12 +23,15 @@ while counter < 100:
     updates = requests.get(f'{API_URL}{BOT_TOKEN}/getUpdates?offset={offset + 1}').json()
 
     if updates['result']:
+        msg_from_user = updates['result'][0]['message']['text']
+        text = f'{msg_from_user} это конечно интересно, но лучше посмотри на котика :)'
         for result in updates['result']:
             offset = result['update_id']
             chat_id = result['message']['from']['id']
             cat_response = requests.get(API_CATS_URL)
             if cat_response.status_code == 200:
                 cat_link = cat_response.json()['file']
+                requests.get(f'{API_URL}{BOT_TOKEN}/sendMessage?chat_id={chat_id}&text={text}')
                 requests.get(f'{API_URL}{BOT_TOKEN}/sendPhoto?chat_id={chat_id}&photo={cat_link}')
             else:
                 requests.get(f'{API_URL}{BOT_TOKEN}/sendMessage?chat_id={chat_id}&text={ERROR_TEXT}')
