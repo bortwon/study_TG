@@ -85,4 +85,83 @@ while counter < 100:
     counter += 1
 
 
-# ======================================================
+# =============================== BOT 2 (Эхо-бот) ===============================
+
+from aiogram import Bot, Dispatcher
+from aiogram.filters import Command
+from aiogram.types import Message
+from aiogram.types import Sticker
+from aiogram import F
+from config import config
+
+bot_token: str = config.bot_token.get_secret_value()
+
+bot: Bot = Bot(token=bot_token)
+dp: Dispatcher = Dispatcher()
+
+
+@dp.message(Command(commands=['start']))
+async def process_start_command(message: Message):
+    await message.answer('Привет!\nМеня зовут Эхо-бот!\nНапиши мне что-нибудь')
+
+
+@dp.message(Command(commands=['help']))
+async def process_help_command(message: Message):
+    await message.answer('Напиши мне что-нибудь и в ответ '
+                         'я пришлю тебе твое сообщение')
+
+
+@dp.message(F.photo)
+async def process_send_photo(message: Message):
+    await message.reply_photo(message.photo[0].file_id)
+
+
+@dp.message()
+async def process_send_sticker(message: Message):
+    await message.reply_sticker(message.sticker.file_id)
+
+
+@dp.message()
+async def send_echo(message: Message):
+    await message.reply(text=message.text)
+
+
+if __name__ == '__main__':
+    dp.run_polling(bot)
+
+
+# Полноценный Эхо-бот
+
+from aiogram import Bot, Dispatcher
+from aiogram.filters import Command
+from aiogram.types import Message
+from config import config
+
+
+bot_token: str = config.bot_token.get_secret_value()
+
+bot: Bot = Bot(token=bot_token)
+dp: Dispatcher = Dispatcher()
+
+
+@dp.message(Command(commands=['start']))
+async def process_start_command(message: Message):
+    await message.answer('Привет!\nМеня зовут Эхо-бот!\nНапиши мне что-нибудь')
+
+
+@dp.message(Command(commands=['help']))
+async def process_help_command(message: Message):
+    await message.answer('Напиши мне что-нибудь и в ответ '
+                         'я пришлю тебе твое сообщение')
+
+
+@dp.message()
+async def send_echo(message: Message):
+    try:
+        await message.send_copy(chat_id=message.chat.id)
+    except TypeError:
+        await message.reply(text='Данный тип апдейтов не поддерживается '
+                                 'методом send_copy')
+
+if __name__ == '__main__':
+    dp.run_polling(bot)
