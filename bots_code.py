@@ -308,7 +308,6 @@ async def get_other_answers(message: Message):
 
 
 if __name__ == '__main__':
-    print(users)
     dp.run_polling(bot)
 
 
